@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Simple Kind to Skin Moisturizing Facial Wash",
+        "imageLink": "https://www.simple.co.uk/dw/image/v2/AAUJ_PRD/on/demandware.static/-/Sites-simple-master-catalog/default/dw8c3c4f8c/images/large/Simple_Kind_To_Skin_Moisturising_Facial_Wash_150ml_Front_1.png",
+        "category": "Cleanser",
+        "benefits": "Gentle cleansing, hydrating, suitable for sensitive skin",
+        "price": "RM 19.90",
+        "ingredients": "Water, Glycerin, Chamomile, Vitamin E, Pro-Vitamin B5"
+    },
+    {
+        "name": "Simple Kind to Skin Replenishing Rich Moisturizer",
+        "imageLink": "https://www.simple.co.uk/dw/image/v2/AAUJ_PRD/on/demandware.static/-/Sites-simple-master-catalog/default/dw8c3c4f8c/images/large/Simple_Kind_To_Skin_Replenishing_Rich_Moisturiser_50ml_Front_1.png",
+        "category": "Moisturizer",
+        "benefits": "Deep hydration, non-greasy, suitable for dry skin",
+        "price": "RM 24.90",
+        "ingredients": "Water, Glycerin, Borage Seed Oil, Vitamin E, Pro-Vitamin B5"
+    },
+    {
+        "name": "Simple Kind to Skin Soothing Facial Toner",
+        "imageLink": "https://www.simple.co.uk/dw/image/v2/AAUJ_PRD/on/demandware.static/-/Sites-simple-master-catalog/default/dw8c3c4f8c/images/large/Simple_Kind_To_Skin_Soothing_Facial_Toner_200ml_Front_1.png",
+        "category": "Toner",
+        "benefits": "Balances skin pH, removes impurities, soothes skin",
+        "price": "RM 18.90",
+        "ingredients": "Water, Glycerin, Chamomile, Witch Hazel, Vitamin E"
+    }
+] 
