@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Bar Interface</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #chatbox {
+            margin-top: 20px;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            align-items: flex-end;
+            margin-right: 0;
+            margin-left: auto;
+        }
+
+        .assistant-message {
+            align-self: flex-start;
+            align-items: flex-start;
+            margin-left: 0;
+            margin-right: auto;
+            max-width: 100%;
+        }
+
+        .message-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 4px;
+            text-align: left;
+        }
+
+        .user-message .message-label {
+            text-align: right;
+            width: 100%;
+        }
+
+        .assistant-message .message-label {
+            text-align: left;
+            width: 100%;
+        }
+
+        .message-content {
+            padding: 10px 15px;
+            border-radius: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message-content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        .user-message .message-content {
+            background-color: #90EE90;
+            color: #333;
+            border-bottom-right-radius: 4px;
+            border-radius: 15px 15px 4px 15px;
+            margin-right: 0;
+            margin-left: auto;
+            text-align: left;
+        }
+
+        .assistant-message .message-content {
+            background-color: #f0f2f5;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            border-radius: 15px 15px 15px 4px;
+            margin-left: 0;
+            margin-right: auto;
+            text-align: justify;
+            text-justify: inter-word;
+            hyphens: auto;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
+        .assistant-message .message-content ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .assistant-message .message-content li {
+            margin-bottom: 8px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            background: #f0f2f5;
+            border-radius: 15px;
+            width: fit-content;
+            margin-left: 0;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        /* Scrollbar styling */
+        #chatbox::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chatbox::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #chatbox::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        #chatbox::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 48px;
+        }
+
+        #search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 0 16px;
+            font-size: 1.1em;
+            border-radius: 8px 0 0 8px;
+            background: transparent;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        #loading-indicator {
+            display: none;
+            align-self: center;
+            margin-right: 12px;
+            margin-left: 8px;
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Use the same circular loading animation for the search bar */
+        #loading-indicator.circular-loading {
+            display: inline-block;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #34c759;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        #search-button {
+            background: #34c759;
+            color: #fff;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            width: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            cursor: pointer;
+            transition: background 0.2s;
+            height: 100%;
+            min-width: 56px;
+            min-height: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #search-button:hover {
+            background: #28a745;
+        }
+
+        .search-bar i.fas.fa-arrow-right {
+            margin: 0;
+            font-size: 1.3em;
+        }
+
+        .image-preview {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #90EE90;
+            margin-left: 8px;
+            display: none;
+        }
+
+        .drop-zone {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: rgba(144, 238, 144, 0.1);
+            border: 2px dashed #90EE90;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .drop-zone.active {
+            display: flex;
+        }
+
+        .drop-zone p {
+            color: #333;
+            font-size: 1.1em;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+        }
+
+        .upload-button {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .upload-button:hover {
+            background-color: rgba(144, 238, 144, 0.2);
+        }
+
+        #floating-products {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .floating-product {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            background: white;
+            padding: 5px;
+        }
+        .floating-product img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .floating-product:hover {
+            transform: scale(1.1);
+            z-index: 1001;
+        }
+
+        /* New circular loading animation */
+        .circular-loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #34c759;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .side-images {
+            position: fixed;
+            top: 120px;
+            left: 180px;
+            width: 220px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            padding: 12px 8px;
+            border: 1.5px solid #e0e0e0;
+            overflow-y: auto;
+            gap: 0;
+            max-height: calc(100vh - 160px);
+        }
+        .side-images img {
+            width: 90%;
+            height: auto;
+            max-height: 110px;
+            margin: 6px 0;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            background: #f8f8f8;
+            padding: 4px;
+            display: block;
+        }
+        .side-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            color: #388e3c;
+            letter-spacing: 0.5px;
+            width: 100%;
+        }
+        .side-images::-webkit-scrollbar {
+            width: 8px;
+        }
+        .side-images::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        .side-images::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Add continuous sliding animation for product slider */
+        @keyframes scrollSlider {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        #product-slider {
+            animation: scrollSlider 60s linear infinite;
+        }
+
+        #model-image-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            width: 180px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        #model-image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-flex">
+        <div class="container">
+            <img src="SIMPLE.PNG" alt="Simple Logo" class="logo-img main-logo">
+            <div class="welcome-message" id="welcome-message">
+                Welcome to Lumina – your personal skincare companion. Ask me anything, from finding the right routine for your skin to choosing products that suit your budget and lifestyle. I'm here to help you feel good in your skin, every step of the way.
+            </div>
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Please wait, initializing chat..." autocomplete="off" disabled>
+                    <span id="loading-indicator"></span>
+                    <button id="search-button" onclick="sendMessage()" disabled>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="search-results" id="search-results">
+                    <!-- Results will appear here -->
+                </div>
+            </div>
+            <div id="chatbox"></div>
+        </div>
+        <div id="side-images-catalogue" class="side-images">
+            <div class="side-title">Product Catalogue</div>
+            <!-- images will be injected here -->
+        </div>
+    </div>
+
+    <!-- Product Image Slider -->
+    <div id="product-slider-container" style="width:100%;overflow:hidden;height:220px;position:relative;margin:24px 0 32px 0;">
+        <div id="product-slider" style="display:flex;transition:transform 0.6s cubic-bezier(.77,0,.18,1);will-change:transform;"></div>
+    </div>
+
+    <script>
+        let isWaitingForResponse = false;
+        let currentThreadId = null;
+
+        // Set your backend API base URL
+        const API_BASE = 'https://ai-intelligent-search-interface.onrender.com';
+
+        // Full S3 product dataset
+        const products = [
+            { name: "Daily Skin Detox Purifying Gel Facial Wash", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Daily+Skin+Detox+Purifying+Gel+Facial+Wash.png" },
+            { name: "Kind To Skin Refreshing Facial Wash", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Refreshing+Facial+Wash.png" },
+            { name: "Water Boost Micellar Gel Facial Wash", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Water+Boost+Micellar+Gel+Facial+Wash.png" },
+            { name: "Kind To Skin Purifying Cleansing Lotion", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Purifying+Cleansing+Lotion.png" },
+            { name: "Kind To Skin Moisturising Face Wash", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Moisturising+Face+Wash.png" },
+            { name: "Kind To Skin Hydrating Cleansing Oil", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Hydrating+Cleansing+Oil.png" },
+            { name: "Age Resisting Facial Wash", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Age+Resisting+Facial+Wash.png" },
+            { name: "Kind To Skin Smoothing Facial Scrub", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Smoothing+Facial+Scrub.png" },
+            { name: "Daily Skin Detox Pore Polishing Face Scrub", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Daily+Skin+Detox+Pore+Polishing+Face+Scrub.png" },
+            { name: "Kind To Skin Refreshing Shower Gel", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Refreshing+Shower+Gel.png" },
+            { name: "Kind To Skin Nourishing Shower Gel", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Nourishing+Shower+Gel.png" },
+            { name: "Kind To Skin Eye Make-up Remover", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Eye+Make-up+Remover.png" },
+            { name: "Kind To Eyes Soothing Eye Balm", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Eyes+Soothing+Eye+Balm.png" },
+            { name: "Kind To Skin Soothing Facial Toner", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Soothing+Facial+Toner.png" },
+            { name: "Water Boost Cleansing Micellar Water", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Water+Boost+Cleansing+Micellar+Water.png" },
+            { name: "Kind To Skin Micellar Cleansing Water", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Micellar+Cleansing+Water.png" },
+            { name: "Age Resisting Night Cream", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Age+Resisting+Night+Cream.png" },
+            { name: "Kind To Skin Hydrating Light Moisturiser", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Hydrating+Light+Moisturiser.png" },
+            { name: "Age Resisting Day Cream Spf 15", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Age+Resisting+Day+Cream+SPF+15.png" },
+            { name: "Kind To Skin Vital Vitamin Night Cream", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Vital+Vitamin+Night+Cream.png" },
+            { name: "Daily Skin Detox Clear Matte Cleansing Wipes", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Daily+Skin+Detox+Clear+Matte+Cleansing+Wipes.png" },
+            { name: "Kind To Skin Micellar Facial Wipes", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/Kind+to+Skin+Micellar+Facial+Wipes.png" },
+            { name: "3 Hyaluronic Acid & Vitamin B5 Booster Serum", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/3_+Hyaluronic+Acid+%26+Vitamin+B5+Booster+Serum.png" },
+            { name: "10 Niacinamide (Vitamin B3) Booster Serum", imageLink: "https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/10_+Niacinamide+(Vitamin+B3)+Booster+Serum.png" }
+        ];
+
+        // Normalization function for robust matching
+        function normalizeName(name) {
+            return name.toLowerCase().replace(/[- ]/g, '');
+        }
+
+        // Function to search products by query
+        function searchProducts(query) {
+            const q = query.toLowerCase();
+            return products.filter(product =>
+                product.name.toLowerCase().includes(q) ||
+                product.imageLink.toLowerCase().includes(q)
+            );
+        }
+
+        // Function to display products in the chat
+        function displayProductsInChat(products) {
+            const chatbox = document.getElementById('chatbox');
+            if (products.length === 0) return;
+            let html = '<div class="message assistant-message"><div class="message-label">Lumina</div><div class="message-content">';
+            html += '<b>Here are the products that match your query:</b><br><br>';
+            products.forEach(product => {
+                html += `<div style='margin-bottom:16px;'>
+                    <b>${product.name}</b><br>
+                    <img src='${product.imageLink}' alt='${product.name}' style='max-width:120px;display:block;margin-top:8px;'>
+                </div>`;
+            });
+            html += '</div></div>';
+            chatbox.insertAdjacentHTML('beforeend', html);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        async function initializeThread() {
+            try {
+                const response = await fetch(`${API_BASE}/api/thread`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                currentThreadId = data.threadId;
+                
+                // Add welcome message to chatbox
+                if (data.welcomeMessage) {
+                    const chatbox = document.getElementById('chatbox');
+                    chatbox.appendChild(createMessageElement(data.welcomeMessage));
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                }
+                // Enable input and button after thread is ready
+                const searchInput = document.getElementById('search-input');
+                searchInput.disabled = false;
+                searchInput.placeholder = 'Ask me anything...';
+                document.getElementById('search-button').disabled = false;
+                // Hide loading indicator
+                document.getElementById('loading-indicator').classList.remove('circular-loading');
+                document.getElementById('loading-indicator').style.display = 'none';
+            } catch (error) {
+                console.error('Error initializing thread:', error);
+            }
+        }
+
+        // Initialize thread when page loads
+        document.addEventListener('DOMContentLoaded', initializeThread);
+
+        function createMessageElement(content, isUser = false) {
+            if (!content) return document.createDocumentFragment();
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'assistant-message'}`;
+            
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'message-label';
+            labelDiv.textContent = isUser ? 'You' : 'Lumina';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            if (isUser) {
+                contentDiv.textContent = content;
+            } else {
+                contentDiv.innerHTML = content;
+            }
+            
+            messageDiv.appendChild(labelDiv);
+            messageDiv.appendChild(contentDiv);
+            
+            return messageDiv;
+        }
+
+        function createLoadingMessage() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading-message';
+            loadingDiv.className = 'message assistant-message';
+            
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'message-label';
+            labelDiv.textContent = 'Lumina';
+            
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'circular-loading';
+            
+            loadingDiv.appendChild(labelDiv);
+            loadingDiv.appendChild(loadingIndicator);
+            
+            return loadingDiv;
+        }
+
+        // Clean the chat response to remove any raw S3 URLs before displaying
+        function cleanResponseText(responseText) {
+            return responseText.replace(/https?:\/\/[^\s]+?\.png/g, '');
+        }
+
+        // Update sendMessage to use the new independent Lumina chatbot backend
+        async function sendMessage() {
+            if (isWaitingForResponse) return;
+            if (!currentThreadId) {
+                alert("Please wait, initializing chat...");
+                return;
+            }
+            
+            const userInput = document.getElementById('search-input').value;
+            const chatbox = document.getElementById('chatbox');
+            
+            if (!userInput.trim()) return;
+            
+            // Add user message
+            const userMessage = createMessageElement(userInput, true);
+            chatbox.appendChild(userMessage);
+            document.getElementById('search-input').value = '';
+            
+            // Show loading state
+            isWaitingForResponse = true;
+            const loadingMessage = createLoadingMessage();
+            chatbox.appendChild(loadingMessage);
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            try {
+                // Call the new independent Lumina chatbot backend
+                const response = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        threadId: currentThreadId,
+                        message: userInput
+                    })
+                });
+
+                const data = await response.json();
+                // Remove loading message
+                loadingMessage.remove();
+                
+                // Always show the assistant's response
+                const assistantMessage = createMessageElement(cleanResponseText(data.response));
+                userMessage.insertAdjacentElement('afterend', assistantMessage);
+                chatbox.scrollTop = chatbox.scrollHeight;
+
+                // Show product images on the sides if mentioned
+                showRecommendedProductImages(data.response);
+
+                // If product query, display products in chat
+                const productKeywords = ['recommend', 'suggest', 'product', 'moisturizer', 'cleanser', 'toner', 'serum', 'cream', 'find', 'show me'];
+                const userInputLower = userInput.trim().toLowerCase();
+                const isProductQuery = productKeywords.some(word => userInputLower.includes(word));
+                if (isProductQuery) {
+                    const foundProducts = searchProducts(userInput);
+                    if (foundProducts.length > 0) {
+                        displayProductsInChat(foundProducts);
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Remove loading message
+                loadingMessage.remove();
+                // Add error message
+                const errorMessage = createMessageElement('Sorry, I encountered an error. Please try again.');
+                userMessage.insertAdjacentElement('afterend', errorMessage);
+                chatbox.scrollTop = chatbox.scrollHeight;
+            } finally {
+                isWaitingForResponse = false;
+            }
+        }
+
+        // Add event listener for Enter key
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !isWaitingForResponse) {
+                sendMessage();
+            }
+        });
+
+        // Show loading indicator while initializing
+        const loadingIndicator = document.getElementById('loading-indicator');
+        loadingIndicator.classList.add('circular-loading');
+        loadingIndicator.style.display = 'inline-block';
+
+        // Update showRecommendedProductImages to use normalization
+        function showRecommendedProductImages(responseText) {
+            // Find all mentioned products using normalized matching
+            const mentioned = products.filter(p =>
+                normalizeName(responseText).includes(normalizeName(p.name))
+            );
+            if (mentioned.length === 0) {
+                showAllProductImagesInOneBox(); // fallback to full catalogue
+                return;
+            }
+            // Split images between left and right, stacked vertically
+            const half = Math.ceil(mentioned.length / 2);
+            const leftImages = mentioned.slice(0, half);
+            const rightImages = mentioned.slice(half);
+            // Render images
+            document.getElementById('side-images-catalogue').innerHTML =
+                '<div class="side-title">Product Catalogue</div>' +
+                mentioned.map(p => `<img src="${p.imageLink}" alt="${p.name}">`).join('');
+        }
+
+        function showAllProductImagesInOneBox() {
+            document.getElementById('side-images-catalogue').innerHTML =
+                '<div class="side-title">Product Catalogue</div>' +
+                products.map(p => `<img src="${p.imageLink}" alt="${p.name}">`).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', showAllProductImagesInOneBox);
+
+        function matchSidePanelHeightToChatbox() {
+            const chatbox = document.getElementById('chatbox');
+            const leftPanel = document.getElementById('side-images-catalogue');
+            if (chatbox && leftPanel) {
+                const chatboxRect = chatbox.getBoundingClientRect();
+                leftPanel.style.top = chatboxRect.top + 'px';
+                leftPanel.style.height = chatbox.offsetHeight + 'px';
+                leftPanel.style.maxHeight = chatbox.offsetHeight + 'px';
+            }
+        }
+        window.addEventListener('DOMContentLoaded', matchSidePanelHeightToChatbox);
+        window.addEventListener('resize', matchSidePanelHeightToChatbox);
+
+        // Show all product images on the sides
+        function showAllProductImages() {
+            // Split all products between left and right
+            const leftImages = products.filter((_, i) => i % 2 === 0);
+            const rightImages = products.filter((_, i) => i % 2 === 1);
+
+            // Render images
+            document.getElementById('side-images-left').innerHTML = leftImages.map(
+                p => `<img src="${p.imageLink}" alt="${p.name}">`
+            ).join('');
+            document.getElementById('side-images-right').innerHTML = rightImages.map(
+                p => `<img src="${p.imageLink}" alt="${p.name}">`
+            ).join('');
+        }
+
+        // Show all product images when the page loads
+        document.addEventListener('DOMContentLoaded', showAllProductImages);
+
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(function() {
+            document.getElementById('welcome-message').classList.add('visible');
+          }, 200);
+        });
+
+        (function createProductSlider() {
+            const slider = document.getElementById('product-slider');
+            if (!slider) return;
+            // Duplicate for seamless loop
+            const allProducts = [...products, ...products];
+            allProducts.forEach(product => {
+                const div = document.createElement('div');
+                div.style.minWidth = '180px';
+                div.style.height = '200px';
+                div.style.display = 'flex';
+                div.style.flexDirection = 'column';
+                div.style.alignItems = 'center';
+                div.style.justifyContent = 'center';
+                div.style.margin = '0 16px';
+                div.style.background = '#fff';
+                div.style.borderRadius = '16px';
+                div.style.boxShadow = '0 2px 8px rgba(0,0,0,0.07)';
+                div.style.padding = '8px';
+
+                const img = document.createElement('img');
+                img.src = product.imageLink;
+                img.alt = product.name;
+                img.style.width = '120px';
+                img.style.height = '120px';
+                img.style.objectFit = 'contain';
+                img.style.borderRadius = '12px';
+                img.style.marginBottom = '10px';
+
+                const name = document.createElement('div');
+                name.textContent = product.name;
+                name.style.fontSize = '1em';
+                name.style.textAlign = 'center';
+                name.style.fontWeight = 'bold';
+
+                div.appendChild(img);
+                div.appendChild(name);
+                slider.appendChild(div);
+            });
+            // Set the width of the slider to fit all items
+            slider.style.width = `${allProducts.length * 196}px`;
+        })();
+    </script>
+    <!-- Model Image in Top-Right Corner -->
+    <div id="model-image-container">
+        <img src="https://intelligentsearchinterface.s3.us-east-1.amazonaws.com/20250524_0302_Skincare+Model+Smiling_remix_01jvz8age2e6nsq30p3fcyp2rn.png" alt="Skincare Model">
+    </div>
+</body>
+</html> 
